@@ -68,6 +68,7 @@ app.get("/matches/:dog_id/confirmed", (req, res) => {
   })
 });
 app.get("/matches/:dog_id/pending", (req, res) => {
+  const params = req.query;
   db.getAllPendingMatches(params, (err, response) => {
     if(err) {
       console.log(err);
@@ -77,11 +78,26 @@ app.get("/matches/:dog_id/pending", (req, res) => {
   })
 });
 app.post("/matches", (req, res) => {
-  db.addAMatch(params, (err) => {
+  const params = req.body;
+  db.getOneMatch(params, (err, response) => {
     if(err) {
       console.log(err);
+    } else if (!response.data) {
+      db.addAMatch(params, (err) => {
+        if(err) {
+          console.log(err);
+        } else {
+          res.sendStatus(201);
+        }
+      })
     } else {
-      res.sendStatus(201);
+      db.updateMatch(params, (err) => {
+        if(err) {
+          console.log(err);
+        } else {
+          res.sendStatus(201);
+        }
+      })
     }
   })
 });
@@ -98,16 +114,18 @@ app.delete("/matches/:dog_id", (req, res) => {
 
 
 //routes for dog_description table
-app.get("/description/:dog_name", (req, res) => {
+app.get("/description/:owner_name/:dog_name", (req, res) => {
+  const params = req.params;
   db.getDogDescription(params, (err, response) => {
     if(err) {
       console.log(err);
     } else {
-      res.json(response);
+      res.json(response.rows);
     }
   })
 });
-app.put("/description/:dog_name", (req, res) => {
+app.put("/description/:owner_name/:dog_name", (req, res) => {
+  const params = req.query;
   db.editDogDescription(params, (err) => {
     if(err) {
       console.log(err);
@@ -117,6 +135,7 @@ app.put("/description/:dog_name", (req, res) => {
   })
 });
 app.post("/description", (req, res) => {
+  const params = req.body;
   db.postDogDescription(params, (err) => {
     if(err) {
       console.log(err);
