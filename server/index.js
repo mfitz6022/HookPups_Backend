@@ -116,7 +116,10 @@ app.delete("/matches/:owner_name/:dog_name", (req, res) => {
 
 //routes for dog_description table
 
-app.get("/description/unmatched/:dog_owner/:dog_id")
+app.get("/description/unmatched/:dog_owner/:dog_id", (req, res) => {
+  const params = req.params;
+  db.
+})
 
 //confirmed working
 app.get("/description/:owner_name/:dog_name", (req, res) => {

@@ -74,7 +74,7 @@ module.exports = {
 
 
   //dog info queries
-
+  getUnmatched
   //confirmed working with postman
   getDogDescription: (data, callback) => {
     pool.query(`SELECT * FROM dog_details WHERE owner_name = '${data.owner_name}' AND dog_name = '${data.dog_name}'`, (err, response) => {
