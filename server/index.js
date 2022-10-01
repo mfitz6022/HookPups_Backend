@@ -125,8 +125,9 @@ app.get("/description/:owner_name/:dog_name", (req, res) => {
   })
 });
 app.put("/description/:owner_name/:dog_name", (req, res) => {
-  const params = req.query;
-  db.editDogDescription(params, (err) => {
+  const updates = req.body;
+  const params = req.params;
+  db.editDogDescription(updates, params, (err) => {
     if(err) {
       console.log(err);
     } else {

@@ -65,17 +65,21 @@ module.exports = {
   },
 
   //dog info queries
+
+
+  //confirmed working with postman
   getDogDescription: (data, callback) => {
     pool.query(`SELECT * FROM dog_details WHERE owner_name = '${data.owner_name}' AND dog_name = '${data.dog_name}'`, (err, response) => {
       callback(err, response);
     });
   },
-  editDogDescription: (data, callback) => {
-      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', photos = '${data.photos}', location = '${data.location}' WHERE owner_name = '${data.owner_name}' AND dog_name = '${data.dog_name}'`, (err, response) => {
+  //Confirmed with postman
+  editDogDescription: (data, params, callback) => {
+      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', photos = '${JSON.stringify(data.photos)}', location = '${data.location}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
         callback(err, response);
       });
   },
-
+  //Confirmed with postman
   postDogDescription: (data, callback) => {
     pool.query(`INSERT INTO dog_details (owner_name, dog_name, breed, size, personality, description, photos, location) VALUES ('${data.owner_name}', '${data.dog_name}', '${data.breed}', '${data.size}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.location}')`, (err, response) => {
       callback(err, response);
