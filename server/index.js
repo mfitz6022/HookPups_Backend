@@ -58,22 +58,23 @@ app.delete("/message/:chatroom_id", (req, res) => {
 
 
 //routes for dog_matches table
-app.get("/matches/:dog_id/confirmed", (req, res) => {
+app.get("/matches/:owner_name/:dog_name/confirmed", (req, res) => {
+  const params = req.params;
   db.getAllConfirmedMatches(params, (err, response) => {
     if (err) {
       console.log(err);
     } else {
-      res.json(response);
+      res.json(response.rows);
     }
   })
 });
-app.get("/matches/:dog_id/pending", (req, res) => {
-  const params = req.query;
+app.get("/matches/:owner_name/:dog_name/pending", (req, res) => {
+  const params = req.params;
   db.getAllPendingMatches(params, (err, response) => {
     if(err) {
       console.log(err);
     } else {
-      res.json(response);
+      res.json(response.rows);
     }
   })
 });
@@ -102,7 +103,7 @@ app.post("/matches", (req, res) => {
   })
 });
 
-app.delete("/matches/:dog_id", (req, res) => {
+app.delete("/matches/:owner_name/:dog_name", (req, res) => {
   db.deleteAMatch(params, (err) => {
     if (err) {
       console.log(err);
@@ -114,6 +115,10 @@ app.delete("/matches/:dog_id", (req, res) => {
 
 
 //routes for dog_description table
+
+app.get("/description/unmatched/:dog_owner/:dog_id")
+
+//confirmed working
 app.get("/description/:owner_name/:dog_name", (req, res) => {
   const params = req.params;
   db.getDogDescription(params, (err, response) => {
@@ -124,6 +129,7 @@ app.get("/description/:owner_name/:dog_name", (req, res) => {
     }
   })
 });
+//confirmed working
 app.put("/description/:owner_name/:dog_name", (req, res) => {
   const updates = req.body;
   const params = req.params;
@@ -135,6 +141,7 @@ app.put("/description/:owner_name/:dog_name", (req, res) => {
     }
   })
 });
+//confirmed working
 app.post("/description", (req, res) => {
   const params = req.body;
   db.postDogDescription(params, (err) => {
