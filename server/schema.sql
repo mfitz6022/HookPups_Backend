@@ -21,15 +21,25 @@ CREATE TABLE dog_details (
 );
 
 CREATE TABLE dog_matches (
-  matches_id SERIAL,
-  dog_id INT,
-  match_id INT
+  match_id SERIAL,
+  dog1_id INT,
+  dog2_id INT,
+  accepted BOOLEAN
 );
 
 CREATE TABLE chat_log (
-  chatroom_id SERIAL,
+  chatroom_id INT REFERENCES dog_matches(match_id),
   messages JSON
 );
+
+CREATE TABLE events (
+  event_id serial,
+  dog1_id INT,
+  dog2_id INT,
+  event_name text,
+  date timestamp,
+  location string
+)
 
 CREATE INDEX owner_idx ON dog_details (owner_name);
 CREATE INDEX dog_idx ON dog_matches (dog_id);
