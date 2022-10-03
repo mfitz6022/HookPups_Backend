@@ -58,6 +58,7 @@ app.delete("/message/:chatroom_id", (req, res) => {
 
 
 //routes for dog_matches table
+//confirmed working
 app.get("/matches/:owner_name/:dog_name/confirmed", (req, res) => {
   const params = req.params;
   db.getAllConfirmedMatches(params, (err, response) => {
@@ -68,6 +69,7 @@ app.get("/matches/:owner_name/:dog_name/confirmed", (req, res) => {
     }
   })
 });
+//confirmed working
 app.get("/matches/:owner_name/:dog_name/pending", (req, res) => {
   const params = req.params;
   db.getAllPendingMatches(params, (err, response) => {
