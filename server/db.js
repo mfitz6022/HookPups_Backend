@@ -76,7 +76,7 @@ module.exports = {
 
   //dog info queries *******************************************
   getUnmatched: (data, callback) => {
-    pool.query(`SELECT * FROM dog_details JOIN dog_matches ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${!data.owner2_name}' AND dog_details.dog_name = '${!data.dog2_name}') OR (match_dog.owner_name = '${!data.owner2_name}' AND match_dog.dog_name = '${!data.dog2_name}')))`, (err, response) => {
+    pool.query(`SELECT * FROM dog_details JOIN dog_matches ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name != '${data.owner2_name}' AND dog_details.dog_name != '${data.dog2_name}') OR (match_dog.owner_name != '${data.owner2_name}' AND match_dog.dog_name != '${data.dog2_name}')))`, (err, response) => {
       if(err) {
         console.log(err);
       } else {
