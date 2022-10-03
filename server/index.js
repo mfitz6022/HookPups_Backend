@@ -118,8 +118,14 @@ app.delete("/matches/:owner_name/:dog_name", (req, res) => {
 
 app.get("/description/unmatched/:dog_owner/:dog_id", (req, res) => {
   const params = req.params;
-  db.
-})
+  db.getUnmatched(params, (err, response) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.json(response.rows);
+    }
+  })
+});
 
 //confirmed working
 app.get("/description/:owner_name/:dog_name", (req, res) => {
