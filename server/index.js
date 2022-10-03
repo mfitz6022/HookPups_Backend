@@ -80,12 +80,13 @@ app.get("/matches/:owner_name/:dog_name/pending", (req, res) => {
     }
   })
 });
+//confirmed working
 app.post("/matches", (req, res) => {
   const params = req.body;
   db.getOneMatch(params, (err, response) => {
     if(err) {
       console.log(err);
-    } else if (!response.data) {
+    } else if (!response.rows.length) {
       db.addAMatch(params, (err) => {
         if(err) {
           console.log(err);
@@ -104,9 +105,11 @@ app.post("/matches", (req, res) => {
     }
   })
 });
-
-app.delete("/matches/:owner_name/:dog_name", (req, res) => {
-  db.deleteAMatch(params, (err) => {
+//confirmed working
+app.delete("/matches/:owner1_name/:dog1_name", (req, res) => {
+  const params = req.params;
+  const data = req.body;
+  db.deleteAMatch(params, data, (err) => {
     if (err) {
       console.log(err);
     } else {
@@ -118,7 +121,8 @@ app.delete("/matches/:owner_name/:dog_name", (req, res) => {
 
 //routes for dog_description table
 
-app.get("/description/unmatched/:dog_owner/:dog_id", (req, res) => {
+//confirmed working
+app.get("/description/unmatched/:owner_name/:dog_name", (req, res) => {
   const params = req.params;
   db.getUnmatched(params, (err, response) => {
     if(err) {
