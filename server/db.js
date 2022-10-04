@@ -81,7 +81,7 @@ module.exports = {
   //dog info queries *******************************************
   //confirmed working
   getUnmatched: (data, callback) => {
-    pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}');`, (err, response) => {
+    pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}');`, (err, response) => {
       if(err) {
         console.log(err);
       } else {
