@@ -58,7 +58,7 @@ module.exports = {
   },
   //confirmed working with postman
   addAMatch: (data, callback) => {
-    pool.query(`INSERT INTO dog_matches (dog1_id, dog2_id, accepted) SELECT (SELECT dog_id AS dog1_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}' ) AS dog1_id, (SELECT dog_id AS dog2_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}' ) AS dog2_id, false AS accepted;`, (err, response) => { //use a join statement to get the dog_id by joining on the names with the dog_description table
+    pool.query(`INSERT INTO dog_matches (dog1_id, dog2_id, accepted) SELECT (SELECT dog_id AS dog1_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}' ) AS dog1_id, (SELECT dog_id AS dog2_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}' ) AS dog2_id, false AS accepted;`, (err, response) => {
       callback(err, response);
     })
   },
@@ -69,8 +69,8 @@ module.exports = {
     })
   },
   //confirmed working with postman
-  deleteAMatch: (params, data, callback) => {  //******************************* */
-    pool.query(`DELETE FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${params.dog1_name}' AND owner_name = '${params.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}');`, (err, response) => { //use a join statement to get the dog_id by joining on the names with the dog_description table
+  deleteAMatch: (params, data, callback) => {
+    pool.query(`DELETE FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${params.dog1_name}' AND owner_name = '${params.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}');`, (err, response) => {
       callback(err, response);
     })
   },
@@ -97,13 +97,31 @@ module.exports = {
   },
   //Confirmed with postman
   editDogDescription: (data, params, callback) => {
-      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', photos = '${JSON.stringify(data.photos)}', location = '${data.location}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
+      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', photos = '${JSON.stringify(data.photos)}', zipcode = '${data.zipcode}, address = ${data.address}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
         callback(err, response);
       });
   },
   //Confirmed with postman
   postDogDescription: (data, callback) => {
-    pool.query(`INSERT INTO dog_details (owner_name, dog_name, breed, size, personality, description, photos, location) VALUES ('${data.owner_name}', '${data.dog_name}', '${data.breed}', '${data.size}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.location}')`, (err, response) => {
+    pool.query(`INSERT INTO dog_details (owner_name, dog_name, breed, size, personality, description, photos, zipcode, address) VALUES ('${data.owner_name}', '${data.dog_name}', '${data.breed}', '${data.size}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.zipcode}', '${data.address}')`, (err, response) => {
+      callback(err, response);
+    });
+  },
+//confirmed with postman
+  postEvent: (data, callback) => {
+    pool.query(`INSERT INTO events (dog1_id, dog2_id, event_name, date, location) SELECT (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AS dog1_id, (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}') AS dog2_id, '${data.event_name}' AS event_name, '${data.date}' AS date, '${data.location}' AS location`, (err, response) => {
+      callback(err, response);
+    });
+  },
+  //confirmed with postman
+  getAllEvents: (data, callback) => {
+    pool.query(`SELECT events.*, matched_dog.* FROM events JOIN dog_details ON events.dog1_id = dog_details.dog_id JOIN dog_details AS matched_dog ON events.dog2_id = matched_dog.dog_id WHERE dog_details.dog_name = '${data.dog_name}' AND dog_details.owner_name = '${data.owner_name}';`, (err, response) => {
+      callback(err, response);
+    });
+  },
+  //confirmed with postman
+  deleteEvent: (data, callback) => {
+    pool.query(`DELETE FROM events WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}')`, (err, response) => {
       callback(err, response);
     });
   },
