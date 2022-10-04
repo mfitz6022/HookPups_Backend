@@ -160,17 +160,17 @@ CREATE INDEX chat_idx ON chat_log (chatroom_id);
 -- WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'test' AND owner_name = 'gracie') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'test' AND owner_name = 'gracie')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = 'test' AND owner_name = 'gracie');
 
 
-INSERT INTO events (dog1_id, dog2_id, event_name, date, location)
-(SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AS dog1_id,
-(SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}') AS dog2_id,
-'${data.event_name}' AS event_name,
-'${data.date}' AS date,
-'${data.location}' AS location;
+-- INSERT INTO events (dog1_id, dog2_id, event_name, date, location)
+-- (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AS dog1_id,
+-- (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}') AS dog2_id,
+-- '${data.event_name}' AS event_name,
+-- '${data.date}' AS date,
+-- '${data.location}' AS location;
 
 
 
 
-SELECT events.*, matched_dog.* FROM events JOIN dog_details ON events.dog1_id = dog_details.dog_id JOIN dog_details AS matched_dog ON events.dog2_id = matched_dog.dog_id WHERE dog_details.dog_name = 'Koda' AND dog_details.owner_name = 'Emily';
+-- SELECT events.*, matched_dog.* FROM events JOIN dog_details ON events.dog1_id = dog_details.dog_id JOIN dog_details AS matched_dog ON events.dog2_id = matched_dog.dog_id WHERE dog_details.dog_name = 'Koda' AND dog_details.owner_name = 'Emily';
 
 -- Trying to get akl the events for koda
   -- However she wants the data to show her the dog details for the dog that is part of the event
