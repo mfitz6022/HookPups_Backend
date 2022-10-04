@@ -12,16 +12,18 @@ DROP TABLE IF EXISTS events CASCADE;
 CREATE TABLE dog_details (
   dog_id SERIAL PRIMARY KEY,
   owner_name TEXT,
+  display_name TEXT,
   dog_name TEXT,
   breed TEXT,
   size TEXT,
+  age INT,
+  gender TEXT,
   personality TEXT,
   description TEXT,
   photos JSON,
   zipcode INT,
   address TEXT
 );
-
 
 CREATE TABLE dog_matches (
   match_id SERIAL PRIMARY KEY,
