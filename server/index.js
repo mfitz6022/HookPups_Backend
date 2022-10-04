@@ -1,61 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
 const db = require('./db.js');
 const app = express();
 
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {cors: {
-    origin: "http://localhost:3001",
-    methods: ['GET', 'POST']
-  }});
-
-app.use(cors());
 app.use(express.json());
-
-
-//routes for chat table
-app.get("/messages/:chatroom_id", (req, res) => {
-  db.getChatroomMessages(params, (err, response) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(response);
-    }
-  })
-});
-app.put("/messages/:chatroom_id", (req, res) => {
-  db.updateChatroomMessages(params, (err) => {
-    if(err) {
-      console.log(err)
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
-app.post("/messages", (req, res) => {
-  db.addNewChatroom(params, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
-app.delete("/message/:chatroom_id", (req, res) => {
-  db.deleteChatroom(params, (err) => {
-    if(err) {
-      console.log(err);
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
-
 
 //routes for dog_matches table
 //confirmed working
@@ -205,8 +154,4 @@ var PORT = `${process.env.PORT}` || 3000;
 app.listen(PORT, () => {
   console.log(`Listening at localhost:${PORT}`);
   console.log(`Database: ${process.env.DB_NAME}`);
-});
-
-httpServer.listen(3001, () => {
-  console.log("socket is listening at localhost:3001");
 });
