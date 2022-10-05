@@ -95,6 +95,16 @@ app.get("/description/:owner_name/:dog_name", (req, res) => {
     }
   })
 });
+app.get("/description/:owner_name", (req, res) => {
+  const params = req.params;
+  db.getOwnersDogs(params, (err, response) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.json(response.rows);
+    }
+  })
+});
 //confirmed working
 app.put("/description/:owner_name/:dog_name", (req, res) => {
   const updates = req.body;
