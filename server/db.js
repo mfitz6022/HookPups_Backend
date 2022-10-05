@@ -46,7 +46,7 @@ module.exports = {
 
   //Confirmed with postman
   getAllPendingMatches: (data,  callback) => {
-    pool.query(`SELECT * FROM dog_matches JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'false')`, (err, response) => {
+    pool.query(`SELECT * FROM dog_matches JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE ((match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}') AND accepted = 'false')`, (err, response) => {
       callback(err, response);
     })
   },
