@@ -49,3 +49,5 @@ CREATE TABLE events (
 CREATE INDEX owner_idx ON dog_details (owner_name);
 CREATE INDEX dog1_idx ON dog_matches (dog1_id);
 CREATE INDEX chat_idx ON chat_log (chatroom_id);
+
+
