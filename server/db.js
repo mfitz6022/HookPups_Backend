@@ -166,7 +166,7 @@ module.exports = {
   },
   //Confirmed with postman
   postDogDescription: (data, callback) => {
-    pool.query(`INSERT INTO dog_details (owner_name, dog_name, breed, size, age, gender, personality, description, photos, zipcode, address) VALUES ('${data.owner_name}', '${data.dog_name}', '${data.breed}', '${data.size}', '${data.age}', '${data.gender}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.zipcode}', '${data.address}')`, (err, response) => {
+    pool.query(`INSERT INTO dog_details (owner_name, display_name, dog_name, breed, size, age, gender, personality, description, photos, zipcode) VALUES ('${data.owner_name}', '${data.display_name}','${data.dog_name}', '${data.breed}', '${data.size}', '${data.age}', '${data.gender}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.zipcode}')`, (err, response) => {
       callback(err, response);
     });
   },
