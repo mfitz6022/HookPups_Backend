@@ -160,7 +160,7 @@ module.exports = {
   },
   //Confirmed with postman
   editDogDescription: (data, params, callback) => {
-      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', age = ${data.age}, gender = ${data.gender}, photos = '${JSON.stringify(data.photos)}', zipcode = '${data.zipcode}, address = ${data.address}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
+      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', age = '${data.age}', gender = '${data.gender}', photos = '${JSON.stringify(data.photos)}', zipcode = '${data.zipcode}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
         callback(err, response);
       });
   },
