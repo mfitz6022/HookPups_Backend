@@ -33,7 +33,6 @@ app.get("/matches/:owner_name/:dog_name/pending", (req, res) => {
 //confirmed working
 app.post("/matches", (req, res) => {
   const params = req.body;
-  console.log(req);
   db.getOneMatch(params, (err, response) => {
     if(err) {
       console.log(err);
