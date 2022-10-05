@@ -166,7 +166,7 @@ module.exports = {
     });
   },
   getOwnersDogs: (data, callback) => {
-    pool.query(`SELECT * FROM dog_details WHERE owner_name = '${data.owner_name}`, (err, response) => {
+    pool.query(`SELECT * FROM dog_details WHERE owner_name = '${data.owner_name}'`, (err, response) => {
       callback(err, response);
     })
   },
