@@ -151,7 +151,7 @@ app.get("/events/:owner_name/:dog_name", (req, res) => {
   })
 });
 //confirmed working with postman
-app.delete("/events/:owner1_name/:dog1_name/:owner2_name/:dog2_name", (req, res) => {
+app.delete("/events/:event_id", (req, res) => {
   const params = req.params;
   db.deleteEvent(params, (err, response) => {
     if (err) {

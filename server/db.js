@@ -51,17 +51,6 @@ module.exports = {
   })
   },
 
-
-
-  // pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner_name}' AND dog_details.dog_name = '${data.dog_name}') OR (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'false')`, (err, response) => {
-  //   callback(err, response);
-  // })
-
-  // pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner_name}' AND dog_details.dog_name = '${data.dog_name}') OR (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'false')`, (err, response) => {
-  //   callback(err, response);
-  // })
-
-
   //confirmed working with postman
   getOneMatch: (data, callback) => {
     pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${data.owner2_name}' AND dog_details.dog_name = '${data.dog2_name}') OR (match_dog.owner_name = '${data.owner2_name}' AND match_dog.dog_name = '${data.dog2_name}')))`, (err, response) => {
@@ -196,7 +185,7 @@ module.exports = {
   },
   //confirmed with postman
   deleteEvent: (data, callback) => {
-    pool.query(`DELETE FROM events WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}')`, (err, response) => {
+    pool.query(`DELETE FROM events WHERE event_id = ${data.event_id}`, (err, response) => {
       callback(err, response);
     });
   },
