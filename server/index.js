@@ -26,7 +26,7 @@ app.get("/matches/:owner_name/:dog_name/pending", (req, res) => {
     if(err) {
       console.log(err);
     } else {
-      res.json(response.rows);
+      res.json(response);
     }
   })
 });
