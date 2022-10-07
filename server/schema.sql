@@ -85,3 +85,4 @@ CREATE INDEX chat_idx ON chat_log (chatroom_id);
 -- JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = 'user1@gmail.com' AND dog_details.dog_name = 'Koda') OR (match_dog.owner_name = 'user1@gmail.com' AND match_dog.dog_name = 'Koda')) AND accepted = 'true');
 
 
+DELETE FROM dog_matches WHERE (dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'Koda' AND owner_name = 'user1@gmail.com') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'Max' AND owner_name = 'user5@gmail.com')) OR (dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'Koda' AND owner_name = 'user1@gmail.com') AND dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = 'Max' AND owner_name = 'user5@gmail.com'));

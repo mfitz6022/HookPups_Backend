@@ -56,10 +56,9 @@ app.post("/matches", (req, res) => {
   })
 });
 //confirmed working
-app.delete("/matches/:owner1_name/:dog1_name", (req, res) => {
+app.delete("/matches/:owner1_name/:dog1_name/:owner2_name/:dog2_name", (req, res) => {
   const params = req.params;
-  const data = req.body;
-  db.deleteAMatch(params, data, (err) => {
+  db.deleteAMatch(params, (err) => {
     if (err) {
       console.log(err);
     } else {
