@@ -71,7 +71,7 @@ module.exports = {
   },
   //confirmed working with postman
   deleteAMatch: (params, data, callback) => {
-    pool.query(`DELETE FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${params.dog1_name}' AND owner_name = '${params.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}');`, (err, response) => {
+    pool.query(`DELETE FROM dog_matches WHERE (dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${params.dog1_name}' AND owner_name = '${params.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}')) OR (dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${params.dog1_name}' AND owner_name = '${params.owner1_name}') AND dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}'));`, (err, response) => {
       callback(err, response);
     })
   },
