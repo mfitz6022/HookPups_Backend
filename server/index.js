@@ -1,60 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const cors = require("cors");
 const db = require('./db.js');
 const app = express();
 
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {cors: {
-    origin: "http://localhost:3001",
-    methods: ['GET', 'POST']
-  }});
-
-app.use(cors());
 app.use(express.json());
-
-
-//routes for chat table
-app.get("/messages/:chatroom_id", (req, res) => {
-  db.getChatroomMessages(params, (err, response) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(response);
-    }
-  })
-});
-app.put("/messages/:chatroom_id", (req, res) => {
-  db.updateChatroomMessages(params, (err) => {
-    if(err) {
-      console.log(err)
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
-app.post("/messages", (req, res) => {
-  db.addNewChatroom(params, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
-app.delete("/message/:chatroom_id", (req, res) => {
-  db.deleteChatroom(params, (err) => {
-    if(err) {
-      console.log(err);
-    } else {
-      res.sendStatus(201);
-    }
-  })
-});
 
 
 //routes for dog_matches table
@@ -106,10 +56,9 @@ app.post("/matches", (req, res) => {
   })
 });
 //confirmed working
-app.delete("/matches/:owner1_name/:dog1_name", (req, res) => {
+app.delete("/matches/:owner1_name/:dog1_name/:owner2_name/:dog2_name", (req, res) => {
   const params = req.params;
-  const data = req.body;
-  db.deleteAMatch(params, data, (err) => {
+  db.deleteAMatch(params, (err) => {
     if (err) {
       console.log(err);
     } else {
@@ -124,7 +73,8 @@ app.delete("/matches/:owner1_name/:dog1_name", (req, res) => {
 //confirmed working
 app.get("/description/unmatched/:owner_name/:dog_name", (req, res) => {
   const params = req.params;
-  db.getUnmatched(params, (err, response) => {
+  const selections = req.query;
+  db.getUnmatched(params, selections, (err, response) => {
     if(err) {
       console.log(err);
     } else {
@@ -137,6 +87,16 @@ app.get("/description/unmatched/:owner_name/:dog_name", (req, res) => {
 app.get("/description/:owner_name/:dog_name", (req, res) => {
   const params = req.params;
   db.getDogDescription(params, (err, response) => {
+    if(err) {
+      console.log(err);
+    } else {
+      res.json(response.rows);
+    }
+  })
+});
+app.get("/description/:owner_name", (req, res) => {
+  const params = req.params;
+  db.getOwnersDogs(params, (err, response) => {
     if(err) {
       console.log(err);
     } else {
@@ -190,7 +150,7 @@ app.get("/events/:owner_name/:dog_name", (req, res) => {
   })
 });
 //confirmed working with postman
-app.delete("/events/:owner1_name/:dog1_name/:owner2_name/:dog2_name", (req, res) => {
+app.delete("/events/:event_id", (req, res) => {
   const params = req.params;
   db.deleteEvent(params, (err, response) => {
     if (err) {
@@ -205,8 +165,4 @@ var PORT = `${process.env.PORT}` || 3000;
 app.listen(PORT, () => {
   console.log(`Listening at localhost:${PORT}`);
   console.log(`Database: ${process.env.DB_NAME}`);
-});
-
-httpServer.listen(3001, () => {
-  console.log("socket is listening at localhost:3001");
 });
