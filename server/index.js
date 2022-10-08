@@ -17,6 +17,19 @@ const io = new Server(httpServer, {cors: {
 app.use(cors());
 app.use(express.json());
 
+// Socket.io connection
+io.on('connection', (socket) => {
+  console.log('user is connected');
+
+  socket.on('send_message', (data) => {
+    console.log(data);
+    socket.emit('recieve_message', data)
+  })
+
+  socket.on('disconnected', () => {
+    console.log('user disconnected')
+  })
+})
 
 //routes for chat table
 app.get("/messages/:chatroom_id", (req, res) => {
