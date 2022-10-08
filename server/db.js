@@ -39,34 +39,39 @@ module.exports = {
   //matches queries
   //Confirmed with postman
   getAllConfirmedMatches: (data, callback) => {
-    pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner_name}' AND dog_details.dog_name = '${data.dog_name}') OR (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'true');`, (err, response) => {
+    pool.query(`SELECT dog_matches.*, match_dog.dog_id AS dog2_id, match_dog.owner_name AS dog2_owner, match_dog.display_name AS dog2_owner_display_name, match_dog.dog_name AS dog2_dog, match_dog.breed AS dog2_breed, match_dog.size AS dog2_size, match_dog.age AS dog2_age, match_dog.gender AS dog2_gender, match_dog.personality AS dog2_personality, match_dog.description AS dog2_description, match_dog.photos AS dog2_photos, match_dog.zipcode AS dog2_zipcode, dog_details.dog_id AS dog1_id, dog_details.owner_name AS dog1_owner, dog_details.display_name AS dog1_owner_display_name, dog_details.dog_name AS dog1_dog, dog_details.breed AS dog1_breed, dog_details.size AS dog1_size, dog_details.age AS dog1_age, dog_details.gender AS dog1_gender, dog_details.personality AS dog1_personality, dog_details.description AS dog1_description, dog_details.photos AS dog1_photos, dog_details.zipcode AS dog1_zipcode FROM dog_matches JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id WHERE (((dog_details.owner_name = '${data.owner_name}' AND dog_details.dog_name = '${data.dog_name}') OR (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = true)`, (err, response) => {
       callback(err, response);
     })
   },
-
   //Confirmed with postman
   getAllPendingMatches: (data,  callback) => {
-    pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner_name}' AND dog_details.dog_name = '${data.dog_name}') OR (match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'false')`, (err, response) => {
-      callback(err, response);
-    })
+  pool.query(`
+  SELECT * FROM dog_matches JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id WHERE (((match_dog.owner_name = '${data.owner_name}' AND match_dog.dog_name = '${data.dog_name}')) AND accepted = 'false');`, (err, response) => {
+    callback(err, response);
+  })
   },
+
+  //confirmed working with postman
   getOneMatch: (data, callback) => {
     pool.query(`SELECT * FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${data.owner2_name}' AND dog_details.dog_name = '${data.dog2_name}') OR (match_dog.owner_name = '${data.owner2_name}' AND match_dog.dog_name = '${data.dog2_name}')))`, (err, response) => {
       callback(err, response);
     })
   },
-  addAMatch: (data, callback) => { //*********************** */
-    pool.query(`INSERT INTO dog_matches (dog1_id, dog2_id, accepted) VALUES ('${data.dog1_id}', '${data.dog2_id}', 'false')`, (err, response) => { //use a join statement to get the dog_id by joining on the names with the dog_description table
+  //confirmed working with postman
+  addAMatch: (data, callback) => {
+    pool.query(`INSERT INTO dog_matches (dog1_id, dog2_id, accepted) SELECT (SELECT dog_id AS dog1_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}' ) AS dog1_id, (SELECT dog_id AS dog2_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}' ) AS dog2_id, false AS accepted;`, (err, response) => {
       callback(err, response);
     })
   },
-  updateMatch: (data, callback) => { //*************************** */
-    pool.query(`UPDATE dog_matches SET accepted = true FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${data.owner2_name}' AND dog_details.dog_name = '${data.dog2_name}') OR (match_dog.owner_name = '${data.owner2_name}' AND match_dog.dog_name = '${data.dog2_name}')))`, (err, response) => {
+  //confirmed working with postman
+  updateMatch: (data, callback) => {
+    pool.query(` UPDATE dog_matches SET accepted = true WHERE match_id IN (SELECT match_id FROM dog_matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${data.owner2_name}' AND dog_details.dog_name = '${data.dog2_name}') OR (match_dog.owner_name = '${data.owner2_name}' AND match_dog.dog_name = '${data.dog2_name}'))));`, (err, response) => {
       callback(err, response);
     })
   },
-  deleteAMatch: (data, callback) => {  //******************************* */
-    pool.query(`DELETE FROM matches JOIN dog_details ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name = '${data.owner2_name}' AND dog_details.dog_name = '${data.dog2_name}') OR (match_dog.owner_name = '${data.owner2_name}' AND match_dog.dog_name = '${data.dog2_name}')))`, (err, response) => { //use a join statement to get the dog_id by joining on the names with the dog_description table
+  //confirmed working with postman
+  deleteAMatch: (data, callback) => {
+    pool.query(`DELETE FROM dog_matches WHERE (dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AND dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}')) OR (dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AND dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}'));`, (err, response) => {
       callback(err, response);
     })
   },
@@ -75,14 +80,73 @@ module.exports = {
 
 
   //dog info queries *******************************************
-  getUnmatched: (data, callback) => {
-    pool.query(`SELECT * FROM dog_details JOIN dog_matches ON dog_matches.dog1_id = dog_details.dog_id JOIN dog_details AS match_dog ON dog_matches.dog2_id = match_dog.dog_id WHERE (((dog_details.owner_name = '${data.owner1_name}' AND dog_details.dog_name = '${data.dog1_name}') OR (match_dog.owner_name = '${data.owner1_name}' AND match_dog.dog_name = '${data.dog1_name}')) AND ((dog_details.owner_name != '${data.owner2_name}' AND dog_details.dog_name != '${data.dog2_name}') OR (match_dog.owner_name != '${data.owner2_name}' AND match_dog.dog_name != '${data.dog2_name}')))`, (err, response) => {
-      if(err) {
-        console.log(err);
-      } else {
-        callback(err, response);
-      }
-    })
+  //confirmed working
+  getUnmatched: (data, selections, callback) => {
+    if (selections.size && selections.breed && selections.personality) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND size = '${selections.size}' AND breed = '${selections.breed}' AND personality = '${selections.personality}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.size) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND size = '${selections.size}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.breed) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND breed = '${selections.breed}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.personality) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND personality = '${selections.personality}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.size && selections.breed) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND size = '${selections.size}' AND breed = '${selections.breed}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.size && selections.personality) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND size = '${selections.size}' AND personality = '${selections.personality}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else if (selections.breed && selections.personality) {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND personality = '${selections.personality}' AND breed = '${selections.breed}';`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    } else {
+      pool.query(`WITH step1 AS (SELECT dog2_id as doggieid FROM dog_matches WHERE dog1_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') union SELECT dog1_id AS doggieid FROM dog_matches WHERE dog2_id IN (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}')) SELECT * FROM dog_details WHERE dog_id NOT IN (SELECT doggieid FROM step1) AND dog_id != (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}') AND zipcode = (SELECT zipcode FROM dog_details WHERE dog_name = '${data.dog_name}' AND owner_name = '${data.owner_name}');`, (err, response) => {
+        if(err) {
+          console.log(err);
+        } else {
+          callback(err, response);
+        }
+      })
+    }
   },
   //confirmed working with postman
   getDogDescription: (data, callback) => {
@@ -90,15 +154,38 @@ module.exports = {
       callback(err, response);
     });
   },
+  getOwnersDogs: (data, callback) => {
+    pool.query(`SELECT * FROM dog_details WHERE owner_name = '${data.owner_name}'`, (err, response) => {
+      callback(err, response);
+    })
+  },
   //Confirmed with postman
   editDogDescription: (data, params, callback) => {
-      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', photos = '${JSON.stringify(data.photos)}', location = '${data.location}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
+      pool.query(`UPDATE dog_details SET size = '${data.size}', personality = '${data.personality}', description = '${data.description}', age = '${data.age}', gender = '${data.gender}', photos = '${JSON.stringify(data.photos)}', zipcode = '${data.zipcode}' WHERE owner_name = '${params.owner_name}' AND dog_name = '${params.dog_name}'`, (err, response) => {
         callback(err, response);
       });
   },
   //Confirmed with postman
   postDogDescription: (data, callback) => {
-    pool.query(`INSERT INTO dog_details (owner_name, dog_name, breed, size, personality, description, photos, location) VALUES ('${data.owner_name}', '${data.dog_name}', '${data.breed}', '${data.size}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.location}')`, (err, response) => {
+    pool.query(`INSERT INTO dog_details (owner_name, display_name, dog_name, breed, size, age, gender, personality, description, photos, zipcode) VALUES ('${data.owner_name}', '${data.display_name}','${data.dog_name}', '${data.breed}', '${data.size}', '${data.age}', '${data.gender}', '${data.personality}', '${data.description}', '${JSON.stringify(data.photos)}', '${data.zipcode}')`, (err, response) => {
+      callback(err, response);
+    });
+  },
+//confirmed with postman
+  postEvent: (data, callback) => {
+    pool.query(`INSERT INTO events (dog1_id, dog2_id, event_name, date, location) SELECT (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog1_name}' AND owner_name = '${data.owner1_name}') AS dog1_id, (SELECT dog_id FROM dog_details WHERE dog_name = '${data.dog2_name}' AND owner_name = '${data.owner2_name}') AS dog2_id, '${data.event_name}' AS event_name, '${data.date}' AS date, '${data.location}' AS location`, (err, response) => {
+      callback(err, response);
+    });
+  },
+  //confirmed with postman
+  getAllEvents: (data, callback) => {
+    pool.query(`SELECT events.*, matched_dog.* FROM events JOIN dog_details ON events.dog1_id = dog_details.dog_id JOIN dog_details AS matched_dog ON events.dog2_id = matched_dog.dog_id WHERE dog_details.dog_name = '${data.dog_name}' AND dog_details.owner_name = '${data.owner_name}';`, (err, response) => {
+      callback(err, response);
+    });
+  },
+  //confirmed with postman
+  deleteEvent: (data, callback) => {
+    pool.query(`DELETE FROM events WHERE event_id = ${data.event_id}`, (err, response) => {
       callback(err, response);
     });
   },
